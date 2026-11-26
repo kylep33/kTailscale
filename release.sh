@@ -19,7 +19,7 @@ sed -i -E "s/var VERSION = '[0-9.]+'/var VERSION = '$V'/" app/index.html
 # A .kpkg is a gzipped tar with the package files at its root. Only tracked files, so local binaries and logs stay out.
 [ -z "$(git status --porcelain -- . ':!manifest.json' ':!app/config.xml' ':!app/index.html')" ] || { echo "commit your changes first"; exit 1; }
 mkdir -p "$(dirname "$OUT")"
-tar czf "$OUT" $(git ls-files | grep -v -x -e release.sh -e README.md -e .gitignore)
+tar czf "$OUT" $(git ls-files | grep -v -x -e release.sh -e README.md -e .gitignore -e cover.png)
 
 python3 - "$REPO/manifest.json" "$V" manifest.json <<'PY'
 import json, sys
@@ -33,7 +33,8 @@ open(path, "w").write(json.dumps(m))
 PY
 
 cd "$REPO"
-git add manifest.json "$OUT"
+cp "$HERE/cover.png" packages/ktailscale/cover.png  # cover on the repo web page
+git add manifest.json "$OUT" packages/ktailscale/cover.png
 git commit -q -m "ktailscale $V: $MSG"
 git push -q
 gh workflow run publish.yml -R "$(git remote get-url origin | sed -E 's#.*github.com[:/]##; s#\.git$##')"  # pushes have not been triggering the deploy
