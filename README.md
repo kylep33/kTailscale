@@ -27,10 +27,10 @@ List of Amazon [Kindles](https://wiki.mobileread.com/wiki/Amazon_Kindle) and the
 
 ```
 ;kpm add-repo https://kylep33.github.io/kile-kpm-repo/manifest.json
-;kpm install tailscale
+;kpm install ktailscale
 ```
 
-Then continue from step 2 below (the extension is already in `extensions/tailscale`). To publish a new version to the KPM repo: `./release.sh 0.3.1 "what changed"`.
+Then continue from step 2 below (the extension is already in `extensions/tailscale`). To publish a new version to the KPM repo: `./release.sh 0.0.2 "what changed"`.
 
 ## Usage:
 

@@ -8,4 +8,4 @@ cp tailscale/bin/*.sh "$DEST/bin/" && chmod +x "$DEST"/bin/*.sh
 for f in auth.key up.args proxy.address; do
     [ -e "$DEST/bin/$f" ] || cp "tailscale/bin/$f" "$DEST/bin/"
 done
-echo "tailscale installed. In KUAL: Tailscale > Install / Update Binaries, then fill in $DEST/bin/auth.key."
+echo "kTailscale installed. In KUAL: Tailscale > Install / Update Binaries, then fill in $DEST/bin/auth.key."
