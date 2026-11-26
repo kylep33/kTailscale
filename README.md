@@ -23,6 +23,15 @@ This (very) simple repo allows you to connect your kindle remotely from anywhere
 
 List of Amazon [Kindles](https://wiki.mobileread.com/wiki/Amazon_Kindle) and their [Serial Numbers](https://wiki.mobileread.com/wiki/Kindle_Serial_Numbers).
 
+## Install with KPM
+
+```
+;kpm add-repo https://kylep33.github.io/kile-kpm-repo/manifest.json
+;kpm install tailscale
+```
+
+Then continue from step 2 below (the extension is already in `extensions/tailscale`). To publish a new version to the KPM repo: `./release.sh 0.3.1 "what changed"`.
+
 ## Usage:
 
 1. Download the repository.
