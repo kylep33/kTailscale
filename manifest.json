@@ -4,11 +4,7 @@
   "name": "kTailscale",
   "author": "mitanshu7 (packaged by kylep33)",
   "description": "Tailscale VPN for jailbroken Kindles, with its own app: one tap to turn it on or off, shows the Kindle's name and Tailscale address, and turns itself on at boot. Open kTailscale from your library, tap Install Tailscale, enter your auth key, done. Based on mitanshu7's tailscale_kual (still in KUAL too). Needs kernel 2.6.32+ (not PW1, K3, K4).",
-  "version": [
-    0,
-    0,
-    1
-  ],
+  "version": [0, 0, 4],
   "dependencies": [],
   "supported_platforms": null
 }
