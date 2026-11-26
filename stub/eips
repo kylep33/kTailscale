@@ -1,0 +1,4 @@
+#!/bin/sh
+# Stand-in for eips while ctl.sh runs the KUAL scripts: "eips 0 22 text" goes to the app's log, not over the app.
+shift 2
+echo "$(date +%H:%M:%S) $*" | sed 's/ *$//' >> "${KT_LOG:-/dev/null}"

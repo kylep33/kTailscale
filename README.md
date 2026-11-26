@@ -30,7 +30,18 @@ List of Amazon [Kindles](https://wiki.mobileread.com/wiki/Amazon_Kindle) and the
 ;kpm install ktailscale
 ```
 
-Then continue from step 2 below (the extension is already in `extensions/tailscale`). To publish a new version to the KPM repo: `./release.sh 0.0.2 "what changed"`.
+Then open **kTailscale** from your library:
+
+1. Tap **Install Tailscale** (downloads about 31 MB over Wi-Fi).
+2. **Settings > Enter auth key**, type your [auth key](https://tailscale.com/kb/1085/auth-keys) and save. Or paste it into `extensions/tailscale/bin/auth.key` over USB.
+3. Tap **Turn on Tailscale**. The app shows the Kindle's name, Tailscale IP and DNS name.
+4. In the [admin console](https://login.tailscale.com/admin/machines), **Disable key expiry** for the Kindle.
+
+Tailscale turns itself on at every boot (Settings > **Turn on Tailscale by default**). Settings also has the mode (Standard / Proxy / Kernel TUN), **Keep Kindle awake while on** (the Kindle turns Wi-Fi off when the screensaver comes on), device name, update and the log.
+
+The app runs the same scripts as the KUAL menu below, through [utild](https://github.com/KindleModding/utild) (bundled), and the boot job lives in `/etc/upstart/ktailscale.conf`.
+
+To publish a new version to the KPM repo: commit, then `./release.sh 0.0.3 "what changed"`.
 
 ## Usage:
 
