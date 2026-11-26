@@ -11,6 +11,7 @@ OUT=$REPO/packages/ktailscale/artifacts/ktailscale_${V}_kindleany.kpkg
 [ -z "$(git -C "$REPO" status --porcelain)" ] || { echo "$REPO has uncommitted changes"; exit 1; }
 
 cd "$HERE"
+sh ./test.sh
 [ ! -s tailscale/bin/auth.key ] || { echo "tailscale/bin/auth.key is not empty, refusing to publish it"; exit 1; }
 sed -i -E "s/\"version\": \[[0-9, ]+\]/\"version\": [$(echo "$V" | sed 's/\./, /g')]/" manifest.json
 sed -i -E "s/(<widget [^>]*version=\")[0-9.]+\"/\1$V\"/" app/config.xml
@@ -19,7 +20,7 @@ sed -i -E "s/var VERSION = '[0-9.]+'/var VERSION = '$V'/" app/index.html
 # A .kpkg is a gzipped tar with the package files at its root. Only tracked files, so local binaries and logs stay out.
 [ -z "$(git status --porcelain -- . ':!manifest.json' ':!app/config.xml' ':!app/index.html')" ] || { echo "commit your changes first"; exit 1; }
 mkdir -p "$(dirname "$OUT")"
-tar czf "$OUT" $(git ls-files | grep -v -x -e release.sh -e README.md -e .gitignore -e cover.png)
+tar czf "$OUT" $(git ls-files | grep -v -x -e release.sh -e test.sh -e README.md -e .gitignore -e cover.png)
 
 python3 - "$REPO/manifest.json" "$V" manifest.json <<'PY'
 import json, sys

@@ -1,7 +1,7 @@
 #!/bin/sh
 
-INSTALL_DIR=/mnt/us/extensions/tailscale/bin
-TMP_DIR=/mnt/us/extensions/tailscale/tmp_update
+INSTALL_DIR=${KT_BIN:-/mnt/us/extensions/tailscale/bin}  # test.sh points this at a temp folder
+TMP_DIR=$INSTALL_DIR/../tmp_update
 LOG=$INSTALL_DIR/update_log.txt
 ARCH=arm
 VERSIONS_TO_TRY=3
@@ -44,19 +44,23 @@ fi
 echo -e "Latest $VERSIONS_TO_TRY versions:\n$LATEST_VERSIONS" >> "$LOG"
 
 # Iterated through release tags from GitHub API, until one with a 200 return code is found
+LATEST=
 for version in $LATEST_VERSIONS; do
-    LATEST=$version
-    echo "Checking $LATEST" >> "$LOG"
-    URL="https://pkgs.tailscale.com/stable/tailscale_${LATEST}_${ARCH}.tgz"
+    echo "Checking $version" >> "$LOG"
+    URL="https://pkgs.tailscale.com/stable/tailscale_${version}_${ARCH}.tgz"
     status=$(curl -s -o /dev/null -I -w "%{http_code}" ${URL})
     if [ "$status" = "200" ]; then
+        LATEST=$version
         echo "Using $LATEST" >> "$LOG"
         break
-    else
-        echo "Version $LATEST does not appear to have been built for ARM. Trying next version" >> "$LOG"
-        continue
     fi
+    echo "Version $version does not appear to have been built for ARM. Trying next version" >> "$LOG"
 done
+
+if [ -z "$LATEST" ]; then
+    log "ERROR: No ARM build of the latest versions found. Try again later."
+    exit 1
+fi
 
 echo "Latest version    : $LATEST" >> "$LOG"
 
@@ -100,18 +104,18 @@ if [ -z "$TS_BIN" ] || [ -z "$TSD_BIN" ]; then
     exit 1
 fi
 
-# Back up existing binaries before replacing (only when upgrading)
-if [ "$CURRENT" != "none" ]; then
-    [ -f "$INSTALL_DIR/tailscale" ]  && cp "$INSTALL_DIR/tailscale"  "$INSTALL_DIR/tailscale.bak"
-    [ -f "$INSTALL_DIR/tailscaled" ] && cp "$INSTALL_DIR/tailscaled" "$INSTALL_DIR/tailscaled.bak"
-    echo "Backed up existing binaries as *.bak" >> "$LOG"
+# Copy next to the old binaries, then rename over them. A rename works even while tailscaled
+# is running (copying over a running program fails with "Text file busy"), and if a copy fails, nothing has changed.
+if ! { cp "$TS_BIN" "$INSTALL_DIR/tailscale.new" && cp "$TSD_BIN" "$INSTALL_DIR/tailscaled.new" &&
+    chmod +x "$INSTALL_DIR/tailscale.new" "$INSTALL_DIR/tailscaled.new"; }; then
+    log "ERROR: Failed to install. Is the Kindle's storage full?"
+    rm -rf "$TMP_DIR" "$INSTALL_DIR/tailscale.new" "$INSTALL_DIR/tailscaled.new"
+    exit 1
 fi
-
-# Install binaries
-cp "$TS_BIN"  "$INSTALL_DIR/tailscale"  && chmod +x "$INSTALL_DIR/tailscale"  || { log "ERROR: Failed to install tailscale.";  rm -rf "$TMP_DIR"; exit 1; }
-cp "$TSD_BIN" "$INSTALL_DIR/tailscaled" && chmod +x "$INSTALL_DIR/tailscaled" || { log "ERROR: Failed to install tailscaled."; rm -rf "$TMP_DIR"; exit 1; }
-
-rm -rf "$TMP_DIR"
+mv -f "$INSTALL_DIR/tailscale.new" "$INSTALL_DIR/tailscale"
+mv -f "$INSTALL_DIR/tailscaled.new" "$INSTALL_DIR/tailscaled"
+# Older versions of this script kept backups (about 50 MB) that nothing used.
+rm -rf "$TMP_DIR" "$INSTALL_DIR/tailscale.bak" "$INSTALL_DIR/tailscaled.bak"
 
 # Create an empty auth.key placeholder on a fresh install
 if [ ! -f "$INSTALL_DIR/auth.key" ]; then

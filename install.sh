@@ -5,9 +5,13 @@ APP_ID=com.kylep33.ktailscale
 DEST=/mnt/us/extensions/tailscale
 
 # The KUAL extension (mitanshu7's scripts), which the app drives.
+# Mark the folder as ours when we create it, so uninstall leaves a KUAL install that was already there.
+[ -d "$DEST" ] || { mkdir -p "$DEST" && touch "$DEST/.made-by-ktailscale"; }
 mkdir -p "$DEST/bin"
 cp tailscale/config.xml tailscale/menu.json "$DEST/"
 cp tailscale/bin/*.sh "$DEST/bin/" && chmod +x "$DEST"/bin/*.sh
+# Before 0.0.5 each mode had its own start script and log.
+rm -f "$DEST/bin/start_tailscaled_proxy.sh" "$DEST/bin/start_tailscaled_tun.sh" "$DEST/bin/tailscaled_proxy_start_log.txt" "$DEST/bin/tailscaled_tun_start_log.txt"
 # Keep the user's settings across upgrades. Binaries and tailscaled.state are not in the package, so they are untouched.
 for f in auth.key up.args proxy.address; do
     [ -e "$DEST/bin/$f" ] || cp "tailscale/bin/$f" "$DEST/bin/"

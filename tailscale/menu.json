@@ -12,6 +12,7 @@
 							"name": "Standard (Userspace)",
 							"priority": 1,
 							"action": "/mnt/us/extensions/tailscale/bin/start_tailscaled.sh",
+							"params": "std",
 							"exitmenu": false,
 							"checked": true,
 							"refresh": false,
@@ -21,7 +22,8 @@
 						{
 							"name": "Proxy Mode (SOCKS5/HTTP)",
 							"priority": 1,
-							"action": "/mnt/us/extensions/tailscale/bin/start_tailscaled_proxy.sh",
+							"action": "/mnt/us/extensions/tailscale/bin/start_tailscaled.sh",
+							"params": "proxy",
 							"exitmenu": false,
 							"checked": true,
 							"refresh": false,
@@ -31,7 +33,8 @@
 						{
 							"name": "Kernel TUN (if supported)",
 							"priority": 1,
-							"action": "/mnt/us/extensions/tailscale/bin/start_tailscaled_tun.sh",
+							"action": "/mnt/us/extensions/tailscale/bin/start_tailscaled.sh",
+							"params": "tun",
 							"exitmenu": false,
 							"checked": true,
 							"refresh": false,

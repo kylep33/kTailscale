@@ -41,7 +41,7 @@ Tailscale turns itself on at every boot (Settings > **Turn on Tailscale by defau
 
 The app runs the same scripts as the KUAL menu below, through [utild](https://github.com/KindleModding/utild) (bundled), and the boot job lives in `/etc/upstart/ktailscale.conf`.
 
-To publish a new version to the KPM repo: commit, then `./release.sh 0.0.3 "what changed"`.
+`sh test.sh` checks `ctl.sh` on a PC (release.sh runs it too). To publish a new version to the KPM repo: commit, then `./release.sh 0.0.3 "what changed"`.
 
 ## Usage:
 
@@ -61,7 +61,7 @@ To publish a new version to the KPM repo: commit, then `./release.sh 0.0.3 "what
 
 8. **Recommended:** In the [Tailscale admin console](https://login.tailscale.com/admin/machines), find your Kindle, click the three-dot menu, and select **Disable key expiry**. After this one-time step, the Kindle will reconnect to your tailnet on every reboot without needing the `auth.key` file again. The auth key is only needed for the very first registration.
 
-9. In case you want to restart fresh, remove the Kindle from the Tailscale admin console, stop `tailscale` and `tailscaled` via KUAL, then delete the state and log files created in `/mnt/us/extensions/tailscale/bin/`: `tailscaled.state`, `tailscale_start_log.txt`, `tailscaled_start_log.txt`, `tailscaled_proxy_start_log.txt`, `tailscaled_tun_start_log.txt`, `tailscale_stop_log.txt`, `tailscaled_stop_log.txt`, and `update_log.txt`. This will fully reset Tailscale's registration on your Kindle.
+9. In case you want to restart fresh, remove the Kindle from the Tailscale admin console, stop `tailscale` and `tailscaled` via KUAL, then delete the state and log files created in `/mnt/us/extensions/tailscale/bin/`: `tailscaled.state`, `tailscale_start_log.txt`, `tailscaled_start_log.txt`, `tailscale_stop_log.txt`, `tailscaled_stop_log.txt`, and `update_log.txt`. This will fully reset Tailscale's registration on your Kindle.
 
 10. Note: Make sure the kindle screen is on, else the kindle sleeps the wifi. You can also not connect to kindle via ssh when it is connected to PC using the cable.
 
@@ -103,7 +103,7 @@ Default: `--ssh` Example: `--ssh --accept-routes`
 The KUAL menu has a single **Install / Update Binaries** entry that handles both cases automatically:
 
 - **Fresh install** (no binaries present): fetches the latest release from the GitHub API, downloads `tailscale_{version}_arm.tgz` from `pkgs.tailscale.com`, installs `tailscale` and `tailscaled` into `extensions/tailscale/bin/`, and creates an empty `auth.key` placeholder if one is not already there.
-- **Already installed**: reads the current version, skips the download if already up to date, otherwise backs up the existing binaries as `*.bak` and installs the newer version.
+- **Already installed**: reads the current version, skips the download if already up to date, otherwise installs the newer version next to the old one and swaps it in, so a failed download or copy leaves the old version working.
 
 Status messages are shown on-screen as the script runs. Full progress and any errors are also written to `update_log.txt` in `extensions/tailscale/bin/`. The Kindle must have an active Wi-Fi connection.
 

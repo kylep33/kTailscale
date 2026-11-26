@@ -116,9 +116,8 @@
   // The app lives in <package>/app/; ctl.sh is in the package folder and writes app/state/.
   var DIR = decodeURIComponent(location.pathname).replace(/\/[^\/]*$/, '');
   var PKG = DIR.replace(/\/app$/, '');
-  var POLL_MS = 3000, TAP_MS = 60, LOG_LINES = 40;
-  var SHEETS = ['settings', 'keySheet', 'nameSheet', 'logSheet'];
-  var d = null, pending = '', toastTimer, lastRaw = '';
+  var POLL_MS = 3000, IDLE_MS = 10000, TAP_MS = 60, LOG_LINES = 40;
+  var d = null, pending = '', toastTimer, lastRaw = '', lastCtl = 0;
 
   function $(id) { return document.getElementById(id); }
   function setHTML(el, h) { if (el.innerHTML !== h) el.innerHTML = h; } // every write is an e-ink redraw
@@ -152,7 +151,9 @@
         try { d = JSON.parse(t); lastRaw = t; } catch (e) {}
       }
       render();
-      ctl('status'); // fresh status for the next read
+      // Fresh status for the next read. Each one starts the 30 MB tailscale program, so only every 10 s unless something is changing.
+      var now = new Date().getTime();
+      if (view().dot === 'busy' || now - lastCtl >= IDLE_MS) { lastCtl = now; ctl('status'); }
     });
   }
 
@@ -301,7 +302,7 @@
   $('ver').innerHTML = 'kTailscale v' + VERSION;
   size();
   render();
-  ctl('status');
+  lastCtl = new Date().getTime(); ctl('status');
   setTimeout(poll, 1000);
   setInterval(poll, POLL_MS);
 })();

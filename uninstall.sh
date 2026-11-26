@@ -15,5 +15,10 @@ DELETE FROM properties WHERE handlerId='$APP_ID';
 DELETE FROM handlerIds WHERE handlerId='$APP_ID';
 SQL
 rm -f /mnt/us/documents/ktailscale.sh
-rm -rf "$DEST"
+if [ -e "$DEST/.made-by-ktailscale" ]; then
+    rm -rf "$DEST"
+else
+    # The KUAL extension was there before us: keep its binaries, key and tailscaled.state, drop only our settings.
+    rm -f "$DEST/bin/mode" "$DEST/bin/awake" "$DEST/bin/no-autostart"
+fi
 exit 0
